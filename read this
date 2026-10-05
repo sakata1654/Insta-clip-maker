@@ -1,0 +1,53 @@
+CLIP STUDIO - SETUP NOTES
+==========================
+
+Folder contents:
+  clip_studio.bat      <- run this (double-click). Combines the old
+                           clip_downloader.bat + face_track_crop.py into
+                           one script with automatic first-run setup.
+  face_track_crop.py   <- your editor script, unchanged.
+  clipstudio_config.txt <- created automatically on first run (remembers
+                           where you told it to save clips).
+
+MISSING FILE - action needed
+-----------------------------
+face_track_crop.py does `import audio_enhance` at the top. That file
+(audio_enhance.py) was not part of what you uploaded, so it isn't
+included here. Drop your audio_enhance.py into this same folder before
+running clip_studio.bat, or the editor step will fail with
+"ModuleNotFoundError: No module named 'audio_enhance'".
+
+What clip_studio.bat does on a brand new PC
+--------------------------------------------
+1. Asks once where clips should be saved (defaults to a "Clips" folder
+   next to the script) and remembers the answer for next time.
+2. Checks for winget, Python, FFmpeg and Node.js - installs any that
+   are missing via `winget install`.
+3. Checks for every Python package the editor needs (yt-dlp, opencv,
+   mediapipe, numpy, moviepy, faster-whisper, Pillow, arabic-reshaper,
+   python-bidi, demucs, torch) and pip-installs any that are missing.
+4. Creates the clips/temp folders and an empty cookies.txt if needed.
+5. Then runs the exact same download -> trim -> edit loop as before.
+
+On every run after the first, steps 1-4 finish in a couple of seconds
+since everything is already checked as "already installed."
+
+Things worth knowing
+---------------------
+- winget requires "App Installer" from the Microsoft Store. Nearly all
+  Windows 10/11 PCs already have it; if not, the script will tell you
+  exactly what to install and stop.
+- cookies.txt starts empty on a fresh PC - you still need to export your
+  real YouTube/Instagram cookies into it yourself for logged-in access.
+- The video encode uses `h264_nvenc`, which needs an NVIDIA GPU. On a
+  PC without one, that write_videofile call in face_track_crop.py will
+  fail - swap the codec to "libx264" in that file if you're moving this
+  to a non-NVIDIA machine.
+- faster-whisper and demucs run much faster with a CUDA GPU; they'll
+  still run on CPU, just slower. Plain `pip install torch` on Windows
+  pulls a CUDA-capable build automatically when an NVIDIA GPU/driver is
+  present.
+- First real run will still take a while the first time it needs the
+  mediapipe face-detector model, a font file, or a Whisper/Demucs model
+  - those are downloaded automatically by face_track_crop.py itself the
+  first time each is used, exactly like before.
